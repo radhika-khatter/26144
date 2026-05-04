@@ -74,3 +74,42 @@ For real- time notification handling web sockets are used.
 Alternative methods:
 - Server-Sent Events (SSE)
 - Polling (less efficient)
+
+
+## stage 2
+for storing notification , MongoDb database is used , as its is flexible and handles data efficiently.
+
+## Schema Design
+
+Each notification will be stored as:
+
+{
+  "_id": "notif_001",
+  "userId": "101",
+  "Type": "Placement",
+  "Message": "TCS drive tomorrow",
+  "isRead": false,
+  "Timestamp": "2026-05-04T10:00:00Z"
+}
+
+
+## Challenges at Scale
+
+- Huge number of notifications (millions)
+- Slow query performance
+
+
+
+## Solutions
+
+1. Indexing:
+   Create indexes on userId and Timestamp for faster queries.
+
+2. Pagination:
+   Fetch limited records (like 10–20 at a time) instead of all data.
+
+3. Caching:
+   Use Redis to store frequently accessed notifications.
+
+4. Archiving:
+   Move old notifications to separate storage.
