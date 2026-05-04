@@ -171,8 +171,80 @@ The system can prepare upcoming notificationse in advance (next page of data) wh
 Instead of clients repeatedly requesting updates, the server can push new notifications directly using connections such as WebSockets. This reduces redundant network calls.
 
 
-## Trade-offs
+## Trade-off
 
 1.Cached data may not always reflect real-time updates.
 2. Fetching data in smaller parts increases the number of requests.
 3. Background loading can consume additional resources if not managed properly.
+
+# Stage 5: Reliable Notification Processing
+
+## Issues in Current Design
+
+The system currently processes notifications one-by-one, which causes some problems:
+
+1. No retry if email fails in between  
+2. Slow performance for large number of users (like 50k)  
+3. Email, DB save, and push notifcations are tightly connected  
+4. One failure can affect the whole flow  
+
+
+## If "send_email" Fails
+
+1. Some users may not recieve the message  
+2. No tracking of failed attempts  
+3. No retry → leads to inconsistant data  
+
+
+## DB Save vs Email Together?
+
+They should not be linked tightly
+
+1. DB should store data even if email fails  
+2.  Keeping them together increases failure impact  
+3.  Separation improves reliability  
+
+
+## Improved Approach
+
+Use async processing with a queue.
+
+1. Add tasks to queue instead of direct processing  
+2. Use workers to handle tasks in parallel  
+3. Separate DB, email, and push logic  
+4. Add retry system  
+5. Maintain logs  
+
+
+## Pseudocode
+function processNotifications(student_ids, message):
+for student_id in student_ids:
+enqueue_task(student_id, message)
+
+function worker():
+while true:
+task = get_next_task()
+
+    try:
+        save_to_db(task.student_id, task.message)
+    except:
+        Log("backend", "error", "db", "DB insert faild")
+    
+    try:
+        send_email(task.student_id, task.message)
+    except:
+        retry_task(task, "email")
+    
+    try:
+        push_to_app(task.student_id, task.message)
+    except:
+        Log("backend", "warn", "service", "Push notifcation failed")
+
+
+
+## Benefits
+
+1. Faster execution with parallel workers  
+2. Failure in one step doesn’t stop others  
+3. Retry improves reliability  
+4. Logs help in debugging  
