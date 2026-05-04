@@ -141,3 +141,38 @@ SELECT DISTINCT studentID
 FROM notifications
 WHERE notificationType = 'Placement'
 AND createdAt >= NOW() - INTERVAL 7 DAY;
+
+# Stage 4: Improving System Performance Under Load
+
+## Problem
+
+As the platform scales, a large number of users may request notifications simultaneously. This can increase pressure on the database and lead to slower response times.
+
+## Approach to Optimization
+
+### 1. Controlled Data Fetching
+Instead of returning the entire notification list, the system will return a limited number of records per request (for example, 10–15). This prevents unnecessary data transfer and improves response time.
+
+
+
+### 2. In-Memory Storage 
+Recently accessed notifications, especially unread ones, can be temporarily stored in a fast in-memory system like Redis. This avoids repeated database queries for the same data.
+
+
+### 3. On-Demand Loading
+Older notifications should not be loaded immediately. They can be fetched only when the user scrolls or explicitly requests more data. This keeps the initial load light.
+
+
+### 4. Background Data Preparation
+The system can prepare upcoming notificationse in advance (next page of data) while the user is interacting with the current view. This ensures smoother experience.
+
+
+### 5. Event-Based Updates
+Instead of clients repeatedly requesting updates, the server can push new notifications directly using connections such as WebSockets. This reduces redundant network calls.
+
+
+## Trade-offs
+
+1.Cached data may not always reflect real-time updates.
+2. Fetching data in smaller parts increases the number of requests.
+3. Background loading can consume additional resources if not managed properly.
