@@ -1,4 +1,4 @@
-## Stage 1
+## Stage 1 - API design
 
 ## overview 
 this a system amde for campus notifications which include placement updates ,events and results. it helps to manage , receive and read notifications .
@@ -76,7 +76,7 @@ Alternative methods:
 - Polling (less efficient)
 
 
-## stage 2
+## stage 2 - Database design
 for storing notification , MongoDb database is used , as its is flexible and handles data efficiently.
 
 ## Schema Design
@@ -113,3 +113,31 @@ Each notification will be stored as:
 
 4. Archiving:
    Move old notifications to separate storage.
+
+## stage 3 - query optimization
+
+## why this query is performing low?
+1. full table scan is required.
+2. no indexing is provided in tables
+3. sorting operation is very costly
+
+## we can create a composite index
+
+CREATE INDEX index_student_readTime
+ON notifications(studentID, isRead, createdAt);
+
+before time complexity : 0(n)
+after time complexity : 0(log n)
+
+having index on evry column is not effective because :
+1. slows write operations 
+2. incrases storage usage
+
+## query 
+
+To find students who received placement notifications in the last 7 days:
+
+SELECT DISTINCT studentID
+FROM notifications
+WHERE notificationType = 'Placement'
+AND createdAt >= NOW() - INTERVAL 7 DAY;
