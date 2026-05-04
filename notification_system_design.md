@@ -248,3 +248,43 @@ task = get_next_task()
 2. Failure in one step doesn’t stop others  
 3. Retry improves reliability  
 4. Logs help in debugging  
+
+# Stage 6: Priority-Based Notification Processing
+
+## Objective
+
+The goal is to identify the most important notifications based on type and recency.
+
+
+## Priority Rules
+
+Notifications are prioritized as follows:
+
+1.Placement → Highest priority
+2.Result → Medium priority
+3. Event → Lowest priority
+
+
+## Approach
+
+1. Each notification type is assigned a weight.
+2. Notifications are sorted based on priority.
+3. If two notifications have the same type, the most recent one is preferred.
+4. The top N notifications are selected .
+
+
+## Implementation Details
+
+1.Data is fetched from the given API using authorization token.
+2.Sorting is done using a custom comparator.
+3.JavaScript array sorting is used for simplicity.
+
+
+## Optimization for Large Data
+
+If notifications are continuously arriving, sorting the entire dataset every time is inefficient.
+
+To improve this:
+1.A Min Heap (Priority Queue) can be used
+2.Only top N elements are maintained
+3.This reduces time complexity and improves performance
