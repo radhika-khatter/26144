@@ -288,3 +288,19 @@ To improve this:
 1.A Min Heap (Priority Queue) can be used
 2.Only top N elements are maintained
 3.This reduces time complexity and improves performance
+
+## Stage 7: Frontend Implementation
+
+A React-based application is developed to display notifications.
+
+### Features:
+1.Displays paginated notifications
+2.Fetches data using secured API
+3.Shows top priority notifications based on type and recency
+
+
+
+### Screenshots:
+
+![Stage 7 Screenshot](./assets/stage_7_outputs/Screenshot 2026-05-04 123436.png)
+
